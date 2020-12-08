@@ -1,16 +1,49 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
 const MOCK_CHILDREN =
-    r'[{"id": 0,"name": "Kalle Svensson (elev)","status": "F;GR","schoolId": "133372F4-AF59-613D-1636-543EC3652111"}]';
+    r'[{"id": 0,"name": "Kalle Svensson (elev)","status": "F;GR","schoolId": "133372F4-AF59-613D-1636-543EC3652111"},{"id": 1,"name": "Jenny Andersson (elev)","status": "F;GR","schoolId": "133372F4-AF59-613D-1636-543EC3652111"}, {"id": 3,"name": "Lina Nilssom (elev)","status": "F;GR","schoolId": "133372F4-AF59-613D-1636-543EC3652111"}]';
 const MOCK_NEWS =
     r'[{"id": 0,"header": "Nya direktiv från folkhälsomyndigheten","intro": "Nedan följer viktig information till dig som förälder med barn","body": "Hej\n\nNedan följer viktig information t...","imageUrl": "string"}]';
 const MOCK_CALENDAR =
     r'[{"id": 0,"title": "Tidig stängning","description": "På torsdag stänger vi 15:45 på grund av Lucia","location": "","startDate": "2020-12-13","endDate": "2020-12-13","allDay": true}]';
 
-class Api {
+abstract class Api {
+  Future<bool> login(String ssn);
+  Future<List<Child>> children();
+  Future<List<CalendarEvent>> calendar(int childId);
+  Future<List<News>> news(int childId);
+  void clearHeaders();
+}
+
+class TestApi extends Api {
+  @override
+  Future<bool> login(String ssn) async => Future.value(true);
+
+  @override
+  Future<List<Child>> children() async {
+    Iterable json = jsonDecode(MOCK_CHILDREN);
+    return json.map((c) => Child.fromJson(c)).toList();
+  }
+
+  @override
+  Future<List<CalendarEvent>> calendar(int childId) async {
+    Iterable json = jsonDecode(MOCK_CALENDAR);
+    return json.map((e) => CalendarEvent.fromJson(e)).toList();
+  }
+
+  @override
+  Future<List<News>> news(int childId) async {
+    Iterable json = jsonDecode(MOCK_NEWS);
+    return json.map((e) => News.fromJson(e)).toList();
+  }
+
+  @override
+  void clearHeaders() {}
+}
+
+class ReleaseApi extends Api {
   static final String baseUrl = 'https://skolplattformen-api.snowflake.cash';
 
   Map<String, String> headers = Map();
@@ -50,6 +83,11 @@ class Api {
     Iterable json = jsonDecode(response.body);
     return json.map((e) => News.fromJson(e)).toList();
   }
+
+  @override
+  void clearHeaders() {
+    headers.clear();
+  }
 }
 
 class News {
@@ -74,20 +112,20 @@ class CalendarEvent {
   final String title;
   final String description;
   final String location;
-  final DateTime startTime;
-  final DateTime endTime;
+  final String startDate;
+  final String endDate;
   final bool allDay;
 
   CalendarEvent(this.id, this.title, this.description, this.location,
-      this.startTime, this.endTime, this.allDay);
+      this.startDate, this.endDate, this.allDay);
 
   CalendarEvent.fromJson(Map<String, dynamic> json)
       : this.id = json['id'],
         this.title = json['title'],
         this.description = json['description'],
         this.location = json['location'],
-        this.startTime = DateTime.parse(json['startTime']),
-        this.endTime = DateTime.parse(json['endTime']),
+        this.startDate = json['startDate'],
+        this.endDate = json['endDate'],
         allDay = json['allDay'];
 }
 

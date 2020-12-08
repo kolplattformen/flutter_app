@@ -5,19 +5,13 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'dart:convert';
-
 import 'package:flutter_test/flutter_test.dart';
-import 'package:skolplattformen/api.dart';
+import 'package:skolplattformen/api_model.dart';
 
 void main() {
-  test('Test json decoding', () {
-    final result = jsonDecode(MOCK_CHILDREN, reviver: (key, value) {
-      print('$key = $value');
-      return value;
-    });
-    // List<Child> children = jsonDecode(MOCK_CHILDREN, reviver: (key, value) => Child.fromJson(value));
-    // print('Got ${children.length}');
-    // print('Child: ${children[0].name}');
+  test('Test json decoding', () async {
+    final model = ApiModel();
+    final children = model.children;
+    children.forEach((child) => print('Child: ${child.name}'));
   });
 }

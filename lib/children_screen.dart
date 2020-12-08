@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'api_model.dart';
 
 import 'api.dart';
+import 'api_model.dart';
 import 'child_details_screen.dart';
+import 'login_screen.dart';
 
 class ChildrenScreen extends StatelessWidget {
   final ApiModel apiModel;
@@ -11,27 +12,31 @@ class ChildrenScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var children = apiModel.children;
     return Scaffold(
       appBar: AppBar(
         title: Text('Dina barn'),
+        actions: [
+          IconButton(icon: Icon(Icons.logout), onPressed: () async {
+            apiModel.logout();
+            Navigator.pushReplacement(context, MaterialPageRoute(
+              builder: (context) => LoginScreen(apiModel),
+            ));
+          })
+        ],
       ),
-      body: FutureBuilder(
-        future: apiModel.children(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            List<Child> children = snapshot.data ?? [];
-            print('Hittade ${children.length} barn');
-            return ListView.builder(
-              itemBuilder: (context, index) => GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChildDetailsScreen(children[index], apiModel),)),
-                  child: ChildItem(children[index])),
-              itemCount: children.length,
-            );
-          } else {
-            print('Laddar in barn...');
-            return Center(child: Text('Läser in dina barn...'));
-          }
+      body: ListView.builder(
+        itemBuilder: (context, index) {
+          return GestureDetector(
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ChildDetailsScreen(children[index], apiModel),
+                  )),
+              child: ChildItem(children[index]));
         },
+        itemCount: children.length,
       ),
     );
   }
@@ -45,8 +50,16 @@ class ChildItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 72.0,
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: Text(child.name),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('${child.name} (${child.status})', style: Theme.of(context).textTheme.headline6,),
+          Text('Skola: ${child.schoolId}', style: Theme.of(context).textTheme.subtitle1,),
+        ],
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'api_model.dart';
 import 'children_screen.dart';
@@ -31,14 +32,16 @@ class LoginScreen extends StatelessWidget {
               OutlineButton(
                   child: Text('Starta BankID'),
                   onPressed: () async {
-                    final result = await apiModel.login(_ssnController.text);
-                    if (result) {
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ChildrenScreen(apiModel: apiModel),
-                          ));
+                    final loginFuture = apiModel.login(_ssnController.text);
+                    
+                    var url = 'https://app.bankid.com/';
+                    if (await canLaunch(url)) {
+                      launch(url);
+                    }
+                    if(await loginFuture) {
+                      Navigator.pushReplacement(context, MaterialPageRoute(
+                        builder: (context) => ChildrenScreen(apiModel: apiModel),
+                      ));
                     }
                   })
             ],

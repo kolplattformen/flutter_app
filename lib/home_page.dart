@@ -12,14 +12,11 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ApiModel>(
-      builder: (context, apiModel, child) {
-        if (apiModel.loggedIn) {
-          return ChildrenScreen(apiModel: apiModel);
-        } else {
-          return LoginScreen(apiModel);
-        }
-      },
-    );
+    final apiModel = Provider.of<ApiModel>(context, listen: false);
+    if (apiModel.loggedIn) {
+      return ChildrenScreen(apiModel: apiModel);
+    } else {
+      return LoginScreen(apiModel);
+    }
   }
 }
