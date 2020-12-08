@@ -2,16 +2,29 @@ import 'package:flutter/material.dart';
 
 import 'api.dart';
 
-class ApiModel extends ChangeNotifier {
-  final Api api = TestApi();
-  // final Api api = ReleaseApi();
+const REVIEW_USER = '121212121212';
 
+class ApiModel extends ChangeNotifier {
+  final Api testApi = TestApi();
+  final Api releaseApi = ReleaseApi();
+
+  Api api;
+
+  var ssn = '';
   var children = List<Child>.empty();
   var loggedIn = false;
   var childNews = Map<int, List<News>>();
   var childCalendar = Map<int, List<CalendarEvent>>();
 
   Future<bool> login(String ssn) async {
+    this.ssn = ssn;
+    if (ssn == REVIEW_USER) {
+      print('Switch to test API');
+      api = testApi;
+    } else {
+      print('Switch to release API');
+      api = releaseApi;
+    }
     loggedIn = await api.login(ssn);
     if (loggedIn) {
       await _loadChildren();

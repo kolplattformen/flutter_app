@@ -24,18 +24,21 @@ class TestApi extends Api {
   @override
   Future<List<Child>> children() async {
     Iterable json = jsonDecode(MOCK_CHILDREN);
+    print('TestApi children!');
     return json.map((c) => Child.fromJson(c)).toList();
   }
 
   @override
   Future<List<CalendarEvent>> calendar(int childId) async {
     Iterable json = jsonDecode(MOCK_CALENDAR);
+    print('TestApi calendar!');
     return json.map((e) => CalendarEvent.fromJson(e)).toList();
   }
 
   @override
   Future<List<News>> news(int childId) async {
     Iterable json = jsonDecode(MOCK_NEWS);
+    print('TestApi news!');
     return json.map((e) => News.fromJson(e)).toList();
   }
 

@@ -33,11 +33,14 @@ class LoginScreen extends StatelessWidget {
                   child: Text('Starta BankID'),
                   onPressed: () async {
                     final loginFuture = apiModel.login(_ssnController.text);
-                    
-                    var url = 'https://app.bankid.com/';
-                    if (await canLaunch(url)) {
-                      launch(url);
+
+                    if (apiModel.ssn != REVIEW_USER) {
+                      var url = 'https://app.bankid.com/';
+                      if (await canLaunch(url)) {
+                        launch(url);
+                      }
                     }
+
                     if(await loginFuture) {
                       Navigator.pushReplacement(context, MaterialPageRoute(
                         builder: (context) => ChildrenScreen(apiModel: apiModel),
