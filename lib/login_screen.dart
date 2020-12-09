@@ -1,17 +1,68 @@
 import 'package:flutter/material.dart';
+import 'package:personnummer/personnummer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'api_model.dart';
 import 'children_screen.dart';
 
-class LoginScreen extends StatelessWidget {
-  final _ssnController = TextEditingController();
+const SSN_REGEXP = r'^\d{12}$';
+
+class LoginScreen extends StatefulWidget {
   final ApiModel apiModel;
 
   LoginScreen(this.apiModel);
 
   @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  TextEditingController _ssnController;
+  var _ssnOk = false;
+
+  final RegExp regExp = RegExp(SSN_REGEXP);
+
+  @override
+  void initState() {
+    super.initState();
+    _ssnController = TextEditingController();
+    _ssnController.addListener(() {
+      final text = _ssnController.text;
+      setState(() {
+        _ssnOk = regExp.hasMatch(text) && Personnummer.valid(text.substring(2));
+        print('SSN changed: $text - $_ssnOk');
+      });
+    });
+  }
+
+
+  @override
+  void dispose() {
+    _ssnController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    var loginAction = () async {
+      final loginFuture = widget.apiModel.login(_ssnController.text);
+
+      if (widget.apiModel.ssn != REVIEW_USER) {
+        var url = 'https://app.bankid.com/';
+        if (await canLaunch(url)) {
+          launch(url);
+        }
+      }
+
+      if (await loginFuture) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChildrenScreen(apiModel: widget.apiModel),
+            ));
+      }
+    };
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Inloggning'),
@@ -30,23 +81,7 @@ class LoginScreen extends StatelessWidget {
                     labelText: 'Personnummer (12 siffror)'),
               ),
               OutlineButton(
-                  child: Text('Starta BankID'),
-                  onPressed: () async {
-                    final loginFuture = apiModel.login(_ssnController.text);
-
-                    if (apiModel.ssn != REVIEW_USER) {
-                      var url = 'https://app.bankid.com/';
-                      if (await canLaunch(url)) {
-                        launch(url);
-                      }
-                    }
-
-                    if(await loginFuture) {
-                      Navigator.pushReplacement(context, MaterialPageRoute(
-                        builder: (context) => ChildrenScreen(apiModel: apiModel),
-                      ));
-                    }
-                  })
+                  child: Text('Starta BankID'), onPressed: _ssnOk ? loginAction : null)
             ],
           ),
         ),
