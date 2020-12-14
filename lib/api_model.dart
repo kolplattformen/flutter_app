@@ -16,8 +16,8 @@ class ApiModel extends ChangeNotifier {
   var ssn = '';
   var children = List<Child>.empty();
   var loggedIn = false;
-  var childNews = Map<int, List<News>>();
-  var childCalendar = Map<int, List<CalendarEvent>>();
+  var childNews = Map<String, List<News>>();
+  var childCalendar = Map<String, List<CalendarEvent>>();
 
   Future<bool> login(String ssn) async {
     this.ssn = ssn;
