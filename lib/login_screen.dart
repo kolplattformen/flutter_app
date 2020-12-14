@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:personnummer/personnummer.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'api_model.dart';
 import 'children_screen.dart';
@@ -35,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-
   @override
   void dispose() {
     _ssnController.dispose();
@@ -47,14 +45,29 @@ class _LoginScreenState extends State<LoginScreen> {
     var loginAction = () async {
       final loginFuture = widget.apiModel.login(_ssnController.text);
 
+      AlertDialog alertDialog;
       if (widget.apiModel.ssn != REVIEW_USER) {
-        var url = 'https://app.bankid.com/';
-        if (await canLaunch(url)) {
-          launch(url);
-        }
+        alertDialog = AlertDialog(
+          title: Text('Starta BankID'),
+          content: Text(
+              'Starta BankID och identifiera dig. Växla sedan tillbaka till den här applikationen.'),
+          actions: [
+            TextButton(
+                child: Text('Avbryt'), onPressed: () => Navigator.pop(context))
+          ],
+        );
+
+        showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => alertDialog,
+        );
       }
 
       if (await loginFuture) {
+        if (alertDialog != null) {
+          Navigator.pop(context);
+        }
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -81,7 +94,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     labelText: 'Personnummer (12 siffror)'),
               ),
               OutlineButton(
-                  child: Text('Starta BankID'), onPressed: _ssnOk ? loginAction : null)
+                  child: Text('Påbörja inloggning!'),
+                  onPressed: _ssnOk ? loginAction : null)
             ],
           ),
         ),
