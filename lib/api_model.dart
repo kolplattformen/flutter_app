@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'api.dart';
 
@@ -25,12 +28,26 @@ class ApiModel extends ChangeNotifier {
       print('Switch to release API');
       api = releaseApi;
     }
-    loggedIn = await api.login(ssn);
+    final tokenAndOrder = await api.token(ssn);
+    if (ssn != REVIEW_USER) {
+      await _launchBankId(tokenAndOrder.token);
+    }
+    loggedIn = await api.jwt(tokenAndOrder.order);
     if (loggedIn) {
       await _loadChildren();
     }
     notifyListeners();
     return loggedIn;
+  }
+
+  Future _launchBankId(String token) async {
+    var urlString = 'bankid:///?autostarttoken=$token&redirect=null';
+    if (Platform.isIOS) {
+      urlString = 'https://app.bankid.com/?autostarttoken=$token&redirect=null';
+    }
+    if(await canLaunch(urlString)) {
+      await launch(urlString, forceSafariVC: false, universalLinksOnly: true);
+    }
   }
 
   Future _loadChildren() async {

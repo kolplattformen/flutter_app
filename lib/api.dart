@@ -9,17 +9,41 @@ const MOCK_NEWS =
 const MOCK_CALENDAR =
     r'[{"id": 0,"title": "Tidig stängning","description": "På torsdag stänger vi 15:45 på grund av Lucia","location": "","startDate": "2020-12-13","endDate": "2020-12-13","allDay": true}]';
 
+class TokenAndOrder {
+  final String token;
+  final String order;
+
+  TokenAndOrder(this.token, this.order);
+
+  TokenAndOrder.fromJson(Map<String, dynamic> json)
+      : token = json['token'],
+        order = json['order'];
+}
+
 abstract class Api {
-  Future<bool> login(String ssn);
+  Future<TokenAndOrder> token(String ssn);
+
+  Future<bool> jwt(String order);
+
   Future<List<Child>> children();
+
   Future<List<CalendarEvent>> calendar(int childId);
+
   Future<List<News>> news(int childId);
+
   void clearHeaders();
 }
 
 class TestApi extends Api {
   @override
-  Future<bool> login(String ssn) async => Future.value(true);
+  Future<TokenAndOrder> token(String ssn) async {
+    return TokenAndOrder('token', 'order');
+  }
+
+  @override
+  Future<bool> jwt(String order) async {
+    return true;
+  }
 
   @override
   Future<List<Child>> children() async {
@@ -51,19 +75,23 @@ class ReleaseApi extends Api {
 
   Map<String, String> headers = Map();
 
-  Future<bool> login(String ssn) async {
-    try {
-      final url = '$baseUrl/login?socialSecurityNumber=$ssn';
-      final loginResponse = await http.post(url);
-      final json = jsonDecode(loginResponse.body);
-      final jwtResponse = await http.get('$baseUrl/login/${json['order']}/jwt');
-      final jwt = jsonDecode(jwtResponse.body);
-      headers['Authorization'] = jwt;
-      return true;
-    } catch (e) {
-      print(e);
+  @override
+  Future<TokenAndOrder> token(String ssn) async {
+    final url = '$baseUrl/login?socialSecurityNumber=$ssn';
+    final tokenResponse = await http.post(url);
+    final json = jsonDecode(tokenResponse.body);
+    return TokenAndOrder.fromJson(json);
+  }
+
+  @override
+  Future<bool> jwt(String order) async {
+    final jwtResponse = await http.get('$baseUrl/login/$order/jwt');
+    if (jwtResponse.statusCode != 200) {
       return false;
     }
+    final jwt = jsonDecode(jwtResponse.body);
+    headers['Authorization'] = jwt;
+    return true;
   }
 
   Future<List<Child>> children() async {
