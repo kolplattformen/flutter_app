@@ -5,7 +5,7 @@
 
     <application
             android:label="flutter_app"
-            android:icon="@mipmap/ic_launcher">
+            android:icon="@mipmap/ic_launcher_round">
         <activity
                 android:name=".MainActivity"
                 android:launchMode="singleTop"
