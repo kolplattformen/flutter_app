@@ -57,7 +57,6 @@ class ChildItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('${child.name} (${child.status})', style: Theme.of(context).textTheme.headline6,),
-          Text('Skola: ${child.schoolId}', style: Theme.of(context).textTheme.subtitle1,),
         ],
       ),
     );

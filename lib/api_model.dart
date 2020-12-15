@@ -1,3 +1,4 @@
+import 'dart:core';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class ApiModel extends ChangeNotifier {
   var loggedIn = false;
   var childNews = Map<String, List<News>>();
   var childCalendar = Map<String, List<CalendarEvent>>();
+  var childNotifications = Map<String, List<ChildNotification>>();
 
   Future<bool> login(String ssn) async {
     this.ssn = ssn;
@@ -57,6 +59,8 @@ class ApiModel extends ChangeNotifier {
       childNews[child.id] = news;
       final calendar = await api.calendar(child.id);
       childCalendar[child.id] = calendar;
+      final notifications = await api.notifications(child.sdsId);
+      childNotifications[child.id] = notifications;
     });
   }
 

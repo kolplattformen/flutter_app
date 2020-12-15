@@ -21,7 +21,7 @@ class _ChildDetailsScreenState extends State<ChildDetailsScreen>
   int tabCount = 0;
 
   bool hasCalendars = false;
-
+  bool hasNotifications = false;
   bool hasNews = false;
 
   @override
@@ -30,6 +30,11 @@ class _ChildDetailsScreenState extends State<ChildDetailsScreen>
     final child = widget.child;
     final calendars = widget.apiModel.childCalendar[child.id];
     final news = widget.apiModel.childNews[child.id];
+    final notifications = widget.apiModel.childNotifications[child.id];
+    hasNotifications = notifications != null && notifications.length > 0;
+    if (hasNotifications) {
+      tabCount++;
+    }
     hasCalendars = calendars != null && calendars.length > 0;
     if (hasCalendars) {
       tabCount++;
@@ -52,6 +57,7 @@ class _ChildDetailsScreenState extends State<ChildDetailsScreen>
   Widget build(BuildContext context) {
     final news = widget.apiModel.childNews[widget.child.id];
     final calendars = widget.apiModel.childCalendar[widget.child.id];
+    final notifications = widget.apiModel.childNotifications[widget.child.id];
     final tabs = List<Tab>();
     final tabViews = List<Widget>();
     if (hasNews) {
@@ -65,6 +71,12 @@ class _ChildDetailsScreenState extends State<ChildDetailsScreen>
       tabViews.add(ListView.builder(
           itemCount: calendars.length,
           itemBuilder: (context, index) => CalendarItem(calendars[index])));
+    }
+    if (hasNotifications) {
+      tabs.add(Tab(text: 'Notiser'));
+      tabViews.add(ListView.builder(
+          itemCount: notifications.length,
+          itemBuilder: (context, index) => NotificationItem(childNotification: notifications[index])));
     }
 
     if (hasNews || hasCalendars) {
@@ -159,6 +171,26 @@ class NewsItem extends StatelessWidget {
           Text(news.header, style: Theme.of(context).textTheme.subtitle1),
           Text(news.intro, style: Theme.of(context).textTheme.bodyText2),
           Text(news.body, style: Theme.of(context).textTheme.bodyText1)
+        ],
+      ),
+    );
+  }
+}
+
+class NotificationItem extends StatelessWidget {
+  final ChildNotification childNotification;
+
+  const NotificationItem({Key key, this.childNotification}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(childNotification.message, style: Theme.of(context).textTheme.subtitle1),
         ],
       ),
     );

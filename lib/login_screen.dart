@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:personnummer/personnummer.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:skolplattformen/child_details_screen.dart';
 
 import 'api_model.dart';
 import 'children_screen.dart';
@@ -47,11 +47,16 @@ class _LoginScreenState extends State<LoginScreen> {
       final loginFuture = widget.apiModel.login(_ssnController.text);
 
       if (await loginFuture) {
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChildrenScreen(apiModel: widget.apiModel),
-            ));
+        Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context) {
+            if (widget.apiModel.children.length > 1) {
+              return ChildrenScreen(apiModel: widget.apiModel);
+            } else {
+              return ChildDetailsScreen(
+                  widget.apiModel.children[0], widget.apiModel);
+            }
+          },
+        ));
       }
     };
 
