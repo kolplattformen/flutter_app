@@ -76,7 +76,7 @@ class TestApi extends Api {
 
   @override
   Future<List<Child>> children() async {
-    Iterable json = jsonDecode(MOCK_CHILD);
+    Iterable json = jsonDecode(MOCK_CHILDREN);
     print('TestApi children!');
     return json.map((c) => Child.fromJson(c)).toList();
   }
@@ -107,7 +107,7 @@ class TestApi extends Api {
 }
 
 class ReleaseApi extends Api {
-  static final String baseUrl = 'https://skolplattformen-api.snowflake.cash';
+  static final String baseUrl = 'https://api.skolplattformen.org';
 
   Map<String, String> headers = Map();
 

@@ -17,25 +17,20 @@ class ChildrenScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Dina barn'),
         actions: [
-          IconButton(icon: Icon(Icons.logout), onPressed: () async {
-            apiModel.logout();
-            Navigator.pushReplacement(context, MaterialPageRoute(
-              builder: (context) => LoginScreen(apiModel),
-            ));
-          })
+          IconButton(
+              icon: Icon(Icons.logout),
+              onPressed: () async {
+                apiModel.logout();
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginScreen(apiModel),
+                    ));
+              })
         ],
       ),
       body: ListView.builder(
-        itemBuilder: (context, index) {
-          return GestureDetector(
-              onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ChildDetailsScreen(children[index], apiModel),
-                  )),
-              child: ChildItem(children[index]));
-        },
+        itemBuilder: (context, index) => ChildItem(children[index], apiModel),
         itemCount: children.length,
       ),
     );
@@ -44,20 +39,34 @@ class ChildrenScreen extends StatelessWidget {
 
 class ChildItem extends StatelessWidget {
   final Child child;
+  final ApiModel apiModel;
 
-  ChildItem(this.child);
+  ChildItem(this.child, this.apiModel);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 72.0,
-      padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('${child.name} (${child.status})', style: Theme.of(context).textTheme.headline6,),
-        ],
+    return Card(
+      elevation: 4,
+      margin: EdgeInsets.all(8.0),
+      child: InkWell(
+        onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChildDetailsScreen(child, apiModel),
+            )),
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${child.name} (${child.status})',
+                style: Theme.of(context).textTheme.headline5,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
