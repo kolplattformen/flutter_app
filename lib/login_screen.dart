@@ -64,12 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.setString(SSN_KEY, _ssnController.text);
         Navigator.pushReplacement(context, MaterialPageRoute(
           builder: (context) {
-            if (widget.apiModel.children.length != 1) {
-              return ChildrenScreen(apiModel: widget.apiModel);
-            } else {
-              return ChildDetailsScreen(
-                  widget.apiModel.children[0], widget.apiModel);
-            }
+            return ChildrenScreen(apiModel: widget.apiModel);
           },
         ));
       }

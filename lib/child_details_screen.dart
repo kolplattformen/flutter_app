@@ -83,15 +83,6 @@ class _ChildDetailsScreenState extends State<ChildDetailsScreen>
       return Scaffold(
         appBar: AppBar(
           title: Text(widget.child.name),
-          actions: [
-            IconButton(icon: Icon(Icons.logout), onPressed: () async {
-              await widget.apiModel.logout();
-              Navigator.pop(context);
-              await Navigator.push(context, MaterialPageRoute(
-                builder: (context) => LoginScreen(widget.apiModel),
-              ));
-            })
-          ],
           bottom: TabBar(
             controller: _tabController,
             tabs: tabs,
