@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:personnummer/personnummer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skolplattformen/child_details_screen.dart';
 
 import 'api_model.dart';
 import 'children_screen.dart';
 
 const SSN_REGEXP = r'^\d{12}$';
+const SSN_KEY = 'user.ssn';
 
 class LoginScreen extends StatefulWidget {
   final ApiModel apiModel;
@@ -33,6 +35,17 @@ class _LoginScreenState extends State<LoginScreen> {
         print('SSN changed: $text - $_ssnOk');
       });
     });
+    _loadStoredSsn();
+  }
+
+  Future<void> _loadStoredSsn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final storedSsn = prefs.getString(SSN_KEY);
+    if (storedSsn.isNotEmpty &&
+        regExp.hasMatch(storedSsn) &&
+        Personnummer.valid(storedSsn.substring(2))) {
+      _ssnController.text = storedSsn;
+    }
   }
 
   @override
@@ -47,6 +60,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final loginFuture = widget.apiModel.login(_ssnController.text);
 
       if (await loginFuture) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString(SSN_KEY, _ssnController.text);
         Navigator.pushReplacement(context, MaterialPageRoute(
           builder: (context) {
             if (widget.apiModel.children.length != 1) {
