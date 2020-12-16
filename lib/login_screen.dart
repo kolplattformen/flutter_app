@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (await loginFuture) {
         Navigator.pushReplacement(context, MaterialPageRoute(
           builder: (context) {
-            if (widget.apiModel.children.length > 1) {
+            if (widget.apiModel.children.length != 1) {
               return ChildrenScreen(apiModel: widget.apiModel);
             } else {
               return ChildDetailsScreen(

@@ -29,10 +29,10 @@ class ChildrenScreen extends StatelessWidget {
               })
         ],
       ),
-      body: ListView.builder(
+      body: children.isNotEmpty ? ListView.builder(
         itemBuilder: (context, index) => ChildItem(children[index], apiModel),
         itemCount: children.length,
-      ),
+      ) : Center(child: Text('Kunde inte hitta några barn kopplat till dig.'),),
     );
   }
 }
